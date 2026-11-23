@@ -40,10 +40,10 @@ router.get("/login", (req, res) => {
 });
 
 router.get("/get_login", (req, res) => {
-  const query = db.prepare(
-    `SELECT * FROM Users WHERE username == '${req.query.username}';`,
-  );
-  const result = query.get();
+ const query = db.prepare(
+  "SELECT * FROM Users WHERE username == ?;"
+);
+const result = query.get(req.query.username);
   if (result && checkPassword(req.query.password, result)) {
     // if username and password are valid
     sleep(1000);
@@ -66,10 +66,10 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/post_register", (req, res) => {
-  let query = db.prepare(
-    `SELECT * FROM Users WHERE username == '${req.body.username}';`,
-  );
-  let result = query.get();
+ let query = db.prepare(
+  "SELECT * FROM Users WHERE username == ?;"
+);
+let result = query.get(req.body.username);
   if (result && result.username === req.body.username) {
     // if username exists
     render(
@@ -109,10 +109,9 @@ router.get("/close", (req, res) => {
     );
     return;
   }
-  const query = db.prepare(
-    `DELETE FROM Users WHERE username == '${req.session.account.username}';`,
-  );
-  query.run();
+  const query = db.prepare("DELETE FROM Users WHERE username == ?;");
+query.run(req.session.account.username);
+
   req.session.loggedIn = false;
   req.session.account = {};
   render(req, res, "index", "Bitbar Home", "Deleted account successfully!");
@@ -209,11 +208,10 @@ router.post("/post_transfer", (req, res) => {
     );
     return;
   }
-
-  let query = db.prepare(
-    `SELECT * FROM Users WHERE username == '${req.body.destination_username}';`,
-  );
-  const receiver = query.get();
+let query = db.prepare(
+  "SELECT * FROM Users WHERE username == ?;"
+);
+const receiver = query.get(req.body.destination_username);
   if (receiver) {
     // if user exists
     const amount = parseInt(req.body.quantity);
